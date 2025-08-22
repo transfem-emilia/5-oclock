@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>It’s 5 O’Clock Somewhere</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body, html { margin: 0; height: 100%; }
+    #map { height: 100%; }
+    .info {
+      position: absolute;
+      top: 10px; left: 10px;
+      background: white; padding: 8px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.2);
+      font-family: sans-serif;
+      max-width: 250px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="info" id="info">Loading...</div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // GeoJSON of world timezones
+    const TZ_GEOJSON = "timezone-names.json";
+
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const infoBox = document.getElementById("info");
+    let tzLayer; // reference to the geoJSON layer
+
+    // Check if current hour in a timezone is 5 PM
+    function isFiveOClock(tz) {
+      try {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          hour: "2-digit", hour12: false,
+          timeZone: tz
+        }).formatToParts(new Date());
+        const hour = Number(parts.find(p => p.type === "hour")?.value || 0);
+        return hour === 17; // anywhere in the 5 PM hour
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Update map highlights
+    function updateLayer(data) {
+      if (tzLayer) {
+        map.removeLayer(tzLayer);
+      }
+
+      tzLayer = L.geoJSON(data, {
+        style: f => ({
+          color: "#555",
+          weight: 0.5,
+          fillColor: isFiveOClock(f.properties.tzid) ? "orange" : "transparent",
+          fillOpacity: isFiveOClock(f.properties.tzid) ? 0.6 : 0
+        }),
+        onEachFeature: (f, l) => {
+          if (isFiveOClock(f.properties.tzid)) {
+            l.bindPopup(`<b>${f.properties.tzid}</b><br>It’s 5 o’clock somewhere!`);
+          }
+        }
+      }).addTo(map);
+
+      const fiveZones = data.features.filter(f => isFiveOClock(f.properties.tzid));
+      if (fiveZones.length) {
+        infoBox.innerHTML = "It’s 5 o’clock in:<br>" + fiveZones.map(f => f.properties.tzid).join("<br>");
+      } else {
+        infoBox.innerHTML = "No places are in the 5 PM hour right now (wait a sec).";
+      }
+    }
+
+    // Load GeoJSON once
+    fetch(TZ_GEOJSON).then(r => r.json()).then(data => {
+      updateLayer(data);
+
+      // Refresh every minute
+      setInterval(() => updateLayer(data), 60000);
+    });
+  </script>
+</body>
+</html>
