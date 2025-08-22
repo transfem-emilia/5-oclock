@@ -35,6 +35,12 @@
 
     const infoBox = document.getElementById("info");
     let tzLayer; // reference to the geoJSON layer
+    const bounds = [
+        [-90, -170],  // southwest corner (lat, lon)
+        [90, 180]     // northeast corner
+    ];
+    map.setMaxBounds(bounds);
+    map.setMinZoom(2); // optional: keep zoom reasonable
 
     // Check if current hour in a timezone is 5 PM
     function isFiveOClock(tz) {
