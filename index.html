@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>It’s 5 O’Clock Somewhere - Emilia</title>
+  <title>It’s 5 O’Clock Somewhere</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body, html { margin: 0; height: 100%; }
@@ -93,6 +93,11 @@
       // Refresh every minute
       setInterval(() => updateLayer(data), 60000);
     });
+  map.attributionControl.addAttribution(
+    `<a href="https://yourwebsite.com" target="_blank">Your Website</a> | 
+    Map Powered By <a href="https://leafletjs.com/" target="_blank">Leaflet JS</a> 
+    and <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>`
+  );
   </script>
 </body>
 </html>
