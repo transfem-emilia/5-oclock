@@ -25,6 +25,14 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+
+    // When you create the map, disable the default attribution prefix
+  var map = L.map('map', {
+      attributionControl: true
+  });
+
+  // Remove the default "Leaflet" attribution text
+  map.attributionControl.setPrefix(false);
     // GeoJSON of world timezones
     const TZ_GEOJSON = "combined-with-oceans-now.json";
 
