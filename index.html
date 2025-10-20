@@ -80,7 +80,10 @@
       }),
       onEachFeature: (f, l) => {
         if (isFiveOClock(f.properties.tzid)) {
-          l.bindPopup(`<b>${f.properties.tzid}</b><br>It’s 5 o’clock somewhere!`);
+          l.bindPopup(`<b>${f.properties.tzid}</b><br>It’s 5 o’clock here!`);
+        }
+        else {
+          l.bindPopup(`<b>${f.properties.tzid}</b><br>It’s not 5 o’clock here!`);
         }
       }
     }).addTo(map);
